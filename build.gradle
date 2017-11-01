@@ -35,8 +35,12 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('javax.persistence:persistence-api:1.0')
+	compile('org.springframework.boot:spring-boot-starter-data-neo4j') {
+		exclude  group: 'org.neo4j', module: 'neo4j-ogm-http-driver'
+	}
+	compile('org.neo4j:neo4j-ogm-bolt-driver:2.1.5')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	testCompile('org.springframework.boot:spring-boot-starter-test')
