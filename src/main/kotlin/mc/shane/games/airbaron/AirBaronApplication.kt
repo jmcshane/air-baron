@@ -2,22 +2,14 @@ package mc.shane.games.airbaron
 
 import org.neo4j.ogm.annotation.NodeEntity
 import org.neo4j.ogm.annotation.Relationship
-import org.neo4j.ogm.session.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.data.annotation.Id
-import org.springframework.data.neo4j.repository.GraphRepository
 import org.springframework.data.neo4j.repository.Neo4jRepository
-import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories
-import org.springframework.data.neo4j.transaction.Neo4jTransactionManager
-import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
@@ -48,18 +40,15 @@ class PlayerInfo @Autowired constructor (val playerRepo : PlayerRepository) {
 }
 
 @Repository
-interface HubRepository : FindByNameNeo4j<Hub>
-
-@Repository
-interface PlayerRepository : FindByNameNeo4j<Player>
-
-@Repository
-interface SpokeRepository : FindByNameNeo4j<Spoke>
-
-@NoRepositoryBean
-interface FindByNameNeo4j<T> : Neo4jRepository<T,Long> {
-    fun findByName(name : String) : T
+interface HubRepository : Neo4jRepository<Hub,Long> {
+    fun findByName(name : String) : Hub?
 }
+
+@Repository
+interface SpokeRepository : Neo4jRepository<Spoke,Long> {
+    fun findByName(name : String) : Spoke?
+}
+
 @NodeEntity
 open class Hub() {
 
@@ -90,15 +79,6 @@ open class Hub() {
 }
 
 @NodeEntity
-open class Player {
-    @Id
-    @GeneratedValue
-    var id : Long? = null
-    var name: String = ""
-    var gameId : Int = 0
-}
-
-@NodeEntity
 open class Spoke() {
 
     constructor(name : String, price : Int) : this() {
@@ -122,14 +102,17 @@ class Startup @Autowired constructor(
     val spokeMap : MutableMap<String,Spoke> = mutableMapOf()
 
     override fun run(vararg args: String?) {
-        if (hubRepo.findByName("Phoenix") == null) {
+        if (!hubRepo.findAll().any()) {
             setupHubs()
+        } else {
+            hubRepo.findAll().forEach {
+                hubMap.put(it.name, it)
+            }
         }
-        if (spokeRepository.findByName("Las Vegas") == null) {
+        if (!spokeRepository.findAll().any()) {
             setupSpokes()
             spokeToHubs()
         }
-
     }
 
     private fun setupSpokes() {

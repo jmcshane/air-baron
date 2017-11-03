@@ -43,6 +43,9 @@ dependencies {
 	compile('org.neo4j:neo4j-ogm-bolt-driver:2.1.5')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+	compile('org.springframework.data:spring-data-rest-hal-browser')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
+	testCompile('org.neo4j:neo4j-ogm-embedded-driver:2.1.5')
+	testCompile('org.neo4j:neo4j-ogm-test:2.1.5')
 }
